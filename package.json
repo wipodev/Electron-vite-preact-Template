@@ -1,5 +1,5 @@
 {
-	"name": "electron-preact-template",
+	"name": "electron-vite-preact-template",
 	"version": "1.0.0",
 	"description": "A minimal Electron application with Preact",
 	"main": "./out/main/index.js",

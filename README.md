@@ -1,4 +1,4 @@
-# Electron Preact Template
+# Electron Vite Preact Template
 
 A minimal Electron application with Preact
 
