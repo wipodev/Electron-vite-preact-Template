@@ -1,18 +1,37 @@
-appId: com.electron.app
+appId: com.wipodev.app
 productName: appName
+copyright: "Copyright © 2026 wipodev"
 directories:
   buildResources: build
+  output: dist
 files:
   - "!**/.vscode/*"
   - "!src/*"
   - "!electron.vite.config.{js,ts,mjs,cjs}"
   - "!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}"
   - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
-asarUnpack:
-  - resources/**
+# -------------------------------------------------------------------------
+# SECCIÓN DE RECURSOS EXTERNOS (ASAR UNPACK)
+# -------------------------------------------------------------------------
+# Esta opción extrae físicamente los archivos de la carpeta 'resources'
+# fuera del archivo comprimido .asar durante la compilación.
+#
+# ÚTIL PARA: Archivos que necesitan ser accedidos directamente por el
+# sistema operativo o binarios (.exe, .sh, drivers) que no pueden
+# ejecutarse desde dentro de un ASAR.
+#
+# NOTA: Se mantiene comentado para evitar duplicados innecesarios (iconos).
+#
+# asarUnpack:
+#   - "resources/**"
+# -------------------------------------------------------------------------
 win:
   executableName: appName
+  icon: resources/icon.ico
 nsis:
+  installerIcon: resources/icon_installer.ico
+  uninstallerIcon: resources/icon.ico
+  installerHeaderIcon: resources/icon.ico
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
@@ -32,11 +51,11 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer: wipodev <wipodev28@gmail.com>
+  category: Template;Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://wipodev.com

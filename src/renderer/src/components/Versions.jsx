@@ -1,7 +1,26 @@
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 
 function Versions() {
-	const [versions] = useState(window.electron.process.versions);
+	// We initialize with empty values ​​to avoid "undefined" errors
+	const [versions, setVersions] = useState({
+		electron: "",
+		chrome: "",
+		node: "",
+	});
+
+	useEffect(() => {
+		// We define an asynchronous function to obtain the data
+		const fetchVersions = async () => {
+			try {
+				const data = await window.api.getVersions();
+				setVersions(data); // We updated the status with the actual data.
+			} catch (error) {
+				console.error("Error obteniendo versiones:", error);
+			}
+		};
+
+		fetchVersions();
+	}, []); // The empty array [] ensures that this only runs once.
 
 	return (
 		<ul class="versions">

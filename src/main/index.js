@@ -1,10 +1,18 @@
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { app, shell, BrowserWindow } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import log from "electron-log/main";
+import { registerHandlers } from "./ipchandlers";
 import icon from "../../resources/icon.png?asset";
 
+log.initialize();
+log.transports.file.level = "info";
+log.transports.file.maxSize = 5 * 1024 * 1024; // 5MB max
+log.transports.console.format = "[{d}-{m}-{y}] [{h}:{i}:{s}.{ms}] [{level}] {text}";
+
+console.log("--- LOGS ROUTE: " + log.transports.file.getFile().path + " ---");
+
 function createWindow() {
-	// Create the browser window.
 	const mainWindow = new BrowserWindow({
 		width: 900,
 		height: 670,
@@ -12,6 +20,7 @@ function createWindow() {
 		autoHideMenuBar: true,
 		...(process.platform === "linux" ? { icon } : {}),
 		webPreferences: {
+			devTools: !app.isPackaged,
 			preload: join(__dirname, "../preload/index.js"),
 			sandbox: false,
 		},
@@ -19,6 +28,11 @@ function createWindow() {
 
 	mainWindow.on("ready-to-show", () => {
 		mainWindow.show();
+		log.info("Main window ready and displayed.");
+	});
+
+	mainWindow.webContents.on("did-fail-load", (e, code, desc) => {
+		log.error(`Window failed to load: ${desc} (Code: ${code})`);
 	});
 
 	mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -35,6 +49,11 @@ function createWindow() {
 	}
 }
 
+// Capture fatal process errors
+process.on("uncaughtException", (err) => {
+	log.error("UNCONTROLLED ERROR (MAIN):", err);
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -49,9 +68,7 @@ app.whenReady().then(() => {
 		optimizer.watchWindowShortcuts(window);
 	});
 
-	// IPC test
-	ipcMain.on("ping", () => console.log("pong"));
-
+	registerHandlers();
 	createWindow();
 
 	app.on("activate", function () {
